@@ -1,0 +1,6 @@
+package com.example.flashfeed.dp
+
+data class Source(
+    val id: String,
+    val name: String
+)
