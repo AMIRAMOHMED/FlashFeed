@@ -39,12 +39,16 @@ android {
 }
 
 dependencies {
+    implementation ("org.ocpsoft.prettytime:prettytime:5.0.4.Final")
+
     implementation(libs.androidx.room.runtime)
     annotationProcessor(libs.androidx.room.compiler)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.retrofit)
 
     implementation(libs.converter.gson)
+    implementation ("androidx.recyclerview:recyclerview-selection:1.1.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.5.0")
 
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.glide)
