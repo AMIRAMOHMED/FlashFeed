@@ -39,7 +39,7 @@ init {
         try {
             if (hasInternetConnection()) {
                 val response = newsRepo.getBreakingNews(code, pageNumber)
-                breakingNews.postValue(HandleBreakingNews(response))
+                breakingNews.postValue(handleNewsResponse(response))
             } else {
                 breakingNews.postValue(Resource.Error("No Internet Connection"))
             }
@@ -54,7 +54,7 @@ init {
 
     }
 
-    private fun HandleBreakingNews(response: Response<News>): Resource<News> {
+    private fun handleNewsResponse(response: Response<News>): Resource<News> {
         if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
                 return Resource.Success(resultResponse)
@@ -65,6 +65,17 @@ init {
         return Resource.Error(response.message())
 
     }
+
+    fun getCategory(cat: String) = viewModelScope.launch {
+
+        categoryNews.postValue(Resource.Loading())
+        val response = newsRepo.getCategoryNews(cat)
+
+        categoryNews.postValue(handleNewsResponse(response))
+
+
+    }
+
 
     private fun hasInternetConnection(): Boolean {
 

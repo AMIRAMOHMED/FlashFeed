@@ -3,7 +3,7 @@ package com.example.flashfeed.dp
 data class Article(
     val author: String,
     val content: Any,
-    val description: Any,
+    val description: String?,
     val publishedAt: String,
     val source: Source,
     val title: String,
