@@ -6,10 +6,9 @@ import java.util.*
 
 class Utils {
 
-    // COMPANION OBJECT ALLOWS US TO use the class without having to create an instance of it
     companion object {
         const val API_KEY = "9f221a991a294e60bd9c7d99186ef0b6"
-        const val BASE_URL = "https://newsapi.org"
+        const val BASE_URL = "https://newsapi.org/"
 
 
 

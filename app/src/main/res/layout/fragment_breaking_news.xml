@@ -33,13 +33,13 @@
 
 
     <LinearLayout
+        android:id="@+id/hsv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:layout_marginBottom="15dp"
         android:gravity="center"
-        android:id="@+id/hsv"
 
-        android:layout_marginBottom="15dp">
+        android:orientation="horizontal">
 
 
         <de.hdodenhof.circleimageview.CircleImageView
@@ -48,37 +48,36 @@
             android:layout_height="75dp"
             android:layout_margin="10dp"
             android:src="@drawable/breakingnews"
-            app:civ_border_width="2dp"
-            app:civ_border_color="@color/red"/>
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/businessImage"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:layout_margin="10dp"
-        android:src="@drawable/business"
-        app:civ_border_width="2dp"
-        app:civ_border_color="@color/red"/>
+            app:civ_border_color="@color/red"
+            app:civ_border_width="2dp" />
 
         <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/sportsImage"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:src="@drawable/sports"
-        android:layout_margin="10dp"
-        app:civ_border_width="2dp"
-        app:civ_border_color="@color/red"/>
+            android:id="@+id/businessImage"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/business"
+            app:civ_border_color="@color/red"
+            app:civ_border_width="2dp" />
 
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/techImage"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
-        android:src="@drawable/tech"
-        app:civ_border_width="2dp"
-        android:layout_margin="10dp"
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/sportsImage"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/sports"
+            app:civ_border_color="@color/red"
+            app:civ_border_width="2dp" />
 
-        app:civ_border_color="@color/red"/>
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/techImage"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/tech"
+            app:civ_border_color="@color/red"
 
+            app:civ_border_width="2dp" />
 
 
     </LinearLayout>

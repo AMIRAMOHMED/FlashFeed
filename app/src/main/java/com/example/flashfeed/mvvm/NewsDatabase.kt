@@ -1,5 +1,4 @@
-package com.example.flashfeed.mvvm
-
+package com.example.newsapiapp.mvvm
 
 import android.content.Context
 import androidx.room.Database
@@ -8,42 +7,28 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.example.flashfeed.dp.ClassConvertors
 import com.example.flashfeed.dp.SavedArticle
+import com.example.flashfeed.mvvm.NewsDao
 
 @Database(entities = [SavedArticle::class], version = 1)
 @TypeConverters(ClassConvertors::class)
 abstract class NewsDatabase : RoomDatabase() {
 
-    // declaring abstract reference for the interface
+    abstract val newsDao: NewsDao
 
-    abstract  val newsDao: NewsDao
-
-    // singleton instances
-
-    companion object{
-        // THIS MAKES THE FIELD IMMEDIATELY VISIBILE TO OTHER THREAD
+    companion object {
         @Volatile
-        private var INSTANCE : NewsDatabase? = null
-        fun getInstance (context: Context) : NewsDatabase{
-            synchronized(this){
-                var instance  = INSTANCE
+        private var INSTANCE: NewsDatabase? = null
 
-                if (instance == null){
-
-                    instance = Room.databaseBuilder(
-                        context.applicationContext,
-                        NewsDatabase::class.java,
-                        "news_database"
-
-
-                    ).build()
-
-                    INSTANCE = instance
-                }
-
-                return instance
+        fun getInstance(context: Context): NewsDatabase {
+            return INSTANCE ?: synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    NewsDatabase::class.java,
+                    "news_database"
+                ).build()
+                INSTANCE = instance
+                instance
             }
         }
     }
-
-
 }

@@ -20,7 +20,7 @@ import com.example.flashfeed.Utils
 import com.example.flashfeed.dp.Article
 
 class ArticleAdapter : RecyclerView.Adapter<ArticleHolder>() {
-    private val articles = listOf<Article>()
+    private var articles = listOf<Article>()
     private  var listener: ItemClickListener ?= null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleHolder {
@@ -71,7 +71,7 @@ class ArticleAdapter : RecyclerView.Adapter<ArticleHolder>() {
                     }
                 }).transition(DrawableTransitionOptions.withCrossFade()).into(holder.imageView)
             holder.textTitle.text = article.title
-            holder.tvSource.text = article.source.name
+            holder.tvSource.text = article.source!!.name
 
             holder.tvDescription.text = article.description
             holder.tvPubslishedAt.text = Utils.DateFormat(article.publishedAt)
@@ -83,6 +83,22 @@ class ArticleAdapter : RecyclerView.Adapter<ArticleHolder>() {
         }
 
     }
+
+
+
+    fun setOnItemClickListener(listener: ItemClickListener) {
+        this.listener = listener
+    }
+
+    fun setList(articles: List<Article>) {
+
+this.articles=articles
+        notifyDataSetChanged()
+
+    }
+
+
+
 }
 
 class ArticleHolder(item: View) : ViewHolder(item) {

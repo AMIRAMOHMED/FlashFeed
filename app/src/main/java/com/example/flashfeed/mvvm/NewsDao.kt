@@ -21,3 +21,5 @@ suspend fun insert(savedArticle: SavedArticle)
  fun deleteAllArticles()
 
 }
+
+

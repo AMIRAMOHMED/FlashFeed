@@ -1,5 +1,6 @@
 package com.example.flashfeed.mvvm
 
+import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -14,27 +15,24 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import retrofit2.Response
 import java.io.IOException
-
-class NewsViewModel(val newsRepo: NewsRepo, application: NewsApplication) :
+class NewsViewModel(private val newsRepo: NewsRepo, application: Application) :
     AndroidViewModel(application) {
-    //get breaking news from api
+
     val breakingNews: MutableLiveData<Resource<News>> = MutableLiveData()
-    val pageNumber = 1
-
-    //get news by category from api
     val categoryNews: MutableLiveData<Resource<News>> = MutableLiveData()
-
-    //get news from db
     val getSavedNews = newsRepo.getAllSavedArticles()
 
-init {
-    getBreakingNews("us")
-}
-    fun getBreakingNews(code: String) = viewModelScope.launch(Dispatchers.IO) {
-        chechingInternetAndBreakingNews(code)
+    private val pageNumber = 1
+
+    init {
+        getBreakingNews("us")
     }
 
-    private suspend fun chechingInternetAndBreakingNews(code: String) {
+    fun getBreakingNews(code: String) = viewModelScope.launch(Dispatchers.IO) {
+        checkInternetAndFetchBreakingNews(code)
+    }
+
+    private suspend fun checkInternetAndFetchBreakingNews(code: String) {
         breakingNews.postValue(Resource.Loading())
         try {
             if (hasInternetConnection()) {
@@ -43,88 +41,64 @@ init {
             } else {
                 breakingNews.postValue(Resource.Error("No Internet Connection"))
             }
-
         } catch (t: Throwable) {
-            when (t) {
-                is IOException -> breakingNews.postValue(Resource.Error("Network Failure"))
-                else -> breakingNews.postValue(Resource.Error("Conversion Error"))
-            }
+            breakingNews.postValue(
+                when (t) {
+                    is IOException -> Resource.Error("Network Failure")
+                    else -> Resource.Error("Conversion Error")
+                }
+            )
         }
-
-
     }
 
     private fun handleNewsResponse(response: Response<News>): Resource<News> {
-        if (response.isSuccessful) {
+        return if (response.isSuccessful) {
             response.body()?.let { resultResponse ->
-                return Resource.Success(resultResponse)
-            }
-
+                Resource.Success(resultResponse)
+            } ?: Resource.Error("Empty Response")
+        } else {
+            Resource.Error(response.message())
         }
-
-        return Resource.Error(response.message())
-
     }
 
     fun getCategory(cat: String) = viewModelScope.launch {
-
         categoryNews.postValue(Resource.Loading())
-        val response = newsRepo.getCategoryNews(cat)
-
-        categoryNews.postValue(handleNewsResponse(response))
-
-
+        try {
+            val response = newsRepo.getCategoryNews(cat)
+            categoryNews.postValue(handleNewsResponse(response))
+        } catch (t: Throwable) {
+            categoryNews.postValue(
+                when (t) {
+                    is IOException -> Resource.Error("Network Failure")
+                    else -> Resource.Error("Conversion Error")
+                }
+            )
+        }
     }
-
 
     private fun hasInternetConnection(): Boolean {
-
         val connectivityManager =
             getApplication<NewsApplication>().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             val activeNetwork = connectivityManager.activeNetwork ?: return false
-            val capabilities =
-                connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
-            return when {
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
-                else -> false
-            }
+            val capabilities = connectivityManager.getNetworkCapabilities(activeNetwork) ?: return false
+            capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
         } else {
             connectivityManager.activeNetworkInfo?.run {
-                return when (type) {
-                    ConnectivityManager.TYPE_WIFI -> true
-                    ConnectivityManager.TYPE_MOBILE -> true
-                    ConnectivityManager.TYPE_ETHERNET -> true
-                    else -> false
-                }
-            }
+                type == ConnectivityManager.TYPE_WIFI ||
+                        type == ConnectivityManager.TYPE_MOBILE ||
+                        type == ConnectivityManager.TYPE_ETHERNET
+            } ?: false
         }
-        return false
     }
 
-
-    fun insertArticle(savedArt: SavedArticle) {
-        insertNews(savedArt)
-    }
-
-    fun insertNews(savedArt: SavedArticle) = viewModelScope.launch(Dispatchers.IO) {
-
-
+    fun insertArticle(savedArt: SavedArticle) = viewModelScope.launch(Dispatchers.IO) {
         newsRepo.insertNews(savedArt)
     }
 
     fun deleteArticle() = viewModelScope.launch(Dispatchers.IO) {
-        deleteAllNews()
-
-    }
-
-    fun deleteAllNews() = viewModelScope.launch(Dispatchers.IO) {
-
-
         newsRepo.deleteAllArticles()
     }
-
 }
-
