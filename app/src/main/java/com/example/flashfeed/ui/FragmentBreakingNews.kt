@@ -1,5 +1,7 @@
 package com.example.flashfeed.ui
+
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
@@ -7,7 +9,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,20 +26,29 @@ import com.example.flashfeed.mvvm.NewsViewModelFac
 import com.example.flashfeed.wrapper.Resource
 import com.example.newsapiapp.mvvm.NewsDatabase
 
-
 class FragmentBreakingNews : Fragment(), ItemClickListener {
     lateinit var viewModel: NewsViewModel
     lateinit var newsAdapter: ArticleAdapter
     lateinit var rv: RecyclerView
     lateinit var pb: ProgressBar
+    lateinit var tec: TextView
+    lateinit var general: TextView
+    lateinit var sports: TextView
+    lateinit var health: TextView
+    var isClicked: Boolean = false
+
+    lateinit var noWifi: ImageView
+    lateinit var noWifiText: TextView
     var addingResponselist = arrayListOf<Article>()
+
+    private val selectedBackground: Drawable? by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button) }
+    private val defaultBackground: Drawable? = null
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_breaking_news, container, false)
     }
 
@@ -44,95 +58,120 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
         val repository = NewsRepo(doa)
         val factory = NewsViewModelFac(repository, requireActivity().application)
         viewModel = factory.create(NewsViewModel::class.java)
+
         rv = view.findViewById(R.id.rvBreakingNews)
         pb = view.findViewById(R.id.paginationProgressBar)
+        tec = view.findViewById(R.id.technology)
+        general = view.findViewById<TextView>(R.id.general)
+        sports = view.findViewById<TextView>(R.id.sport)
+        health = view.findViewById<TextView>(R.id.health)
+        noWifi = view.findViewById<ImageView>(R.id.noWifi)
+        noWifiText = view.findViewById<TextView>(R.id.noWifiText)
 
         val cm = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val nInfo = cm.activeNetworkInfo
-        if (nInfo !=null && nInfo.isConnected){
+        if (nInfo != null && nInfo.isConnected) {
             setUpRecyclerView()
             loadBreakingNews()
-            }
-
+            isClicked = true
+        } else {
+            noWifi.visibility = View.VISIBLE
+            noWifiText.visibility = View.VISIBLE
         }
-    private fun loadCategoryNews() {
 
-        viewModel.categoryNews.observe(viewLifecycleOwner, Observer {response->
-
-
-            when (response){
-
-                is Resource.Success->{
-                    hideProgressBar()
-                    response.data?.let{newsresponse->
-
-                        addingResponselist = newsresponse.articles as ArrayList<Article>
-//                        newsAdapter.setlist(newsresponse.articles)
-
-                    }
+        val catListener = View.OnClickListener {
+            when (it.id) {
+                R.id.technology -> {
+                    viewModel.getCategory("technology")
+                    loadCategoryNews()
+                    isClicked = true
+                    selectCategory(tec)
                 }
-
-
-                is Resource.Error->{
-                    hideProgressBar()
-                    response.message?.let{messsage->
-                        Log.i("BREAKING FRAG", messsage.toString())
-
-                    }
+                R.id.general -> {
+                    viewModel.getCategory("general")
+                    loadCategoryNews()
+                    isClicked = true
+                    selectCategory(general)
                 }
-
-                is Resource.Loading->{
-                    showProgressBar()
+                R.id.sport -> {
+                    viewModel.getCategory("sports")
+                    loadCategoryNews()
+                    isClicked = true
+                    selectCategory(sports)
                 }
-
+                R.id.health -> {
+                    viewModel.getCategory("health")
+                    loadCategoryNews()
+                    isClicked = true
+                    selectCategory(health)
+                }
             }
+        }
 
-
-
-
-        })
+        tec.setOnClickListener(catListener)
+        general.setOnClickListener(catListener)
+        sports.setOnClickListener(catListener)
+        health.setOnClickListener(catListener)
     }
+
+    private fun selectCategory(selectedTextView: TextView) {
+        // Reset all backgrounds to default
+        tec.background = defaultBackground
+        general.background = defaultBackground
+        sports.background = defaultBackground
+        health.background = defaultBackground
+
+        // Set the selected background to the clicked category
+        selectedTextView.background = selectedBackground
+    }
+
     private fun loadBreakingNews() {
         viewModel.breakingNews.observe(viewLifecycleOwner, Observer { response ->
             when (response) {
-
-
                 is Resource.Success -> {
                     hideProgressBar()
                     response.data?.let { newsResponse ->
                         addingResponselist = newsResponse.articles as ArrayList<Article>
-
                         newsAdapter.setList(addingResponselist)
                         Log.i("BreakingFragment", newsResponse.articles[1].toString())
-                        newsAdapter.notifyDataSetChanged() // Ensure this is called
-
-
-
+                        newsAdapter.notifyDataSetChanged()
                     }
-
                 }
-
                 is Resource.Error -> {
                     hideProgressBar()
                     response.data?.let { message ->
-                        {
-                            Log.i("BreakingFragment", message.toString())
-                        }
-
+                        Log.i("BreakingFragment", message.toString())
                     }
                 }
-
                 is Resource.Loading -> {
-
                     showProgressBar()
-
                 }
             }
-
-
         })
+    }
 
-
+    private fun loadCategoryNews() {
+        viewModel.categoryNews.observe(viewLifecycleOwner, Observer { response ->
+            when (response) {
+                is Resource.Success -> {
+                    hideProgressBar()
+                    response.data?.let { newsResponse ->
+                        addingResponselist = newsResponse.articles as ArrayList<Article>
+                        newsAdapter.setList(addingResponselist)
+                        newsAdapter.notifyDataSetChanged()
+                    }
+                }
+                is Resource.Error -> {
+                    hideProgressBar()
+                    response.data?.let { message ->
+                        Log.i("CategoryFragment", message.toString())
+                    }
+                }
+                is Resource.Loading -> {
+                    showProgressBar()
+                }
+            }
+        })
     }
 
     private fun setUpRecyclerView() {
@@ -141,10 +180,7 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
         rv.apply {
             adapter = newsAdapter
             layoutManager = LinearLayoutManager(activity, LinearLayoutManager.VERTICAL, false)
-
         }
-
-
     }
 
     private fun showProgressBar() {
@@ -156,6 +192,6 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
     }
 
     override fun onItemClick(position: Int, article: Article) {
-        TODO("Not yet implemented")
+        // Handle item click
     }
 }
