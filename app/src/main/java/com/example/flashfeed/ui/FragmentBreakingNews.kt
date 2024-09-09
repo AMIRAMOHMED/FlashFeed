@@ -12,8 +12,10 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Observer
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.flashfeed.R
@@ -192,6 +194,9 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
     }
 
     override fun onItemClick(position: Int, article: Article) {
-        // Handle item click
+        val action = FragmentBreakingNewsDirections.actionFragmentBreakingNewsToFragmentArticle(article)
+        view?.findNavController()?.navigate(action)
+        Toast.makeText(context, "check ${article.title}", Toast.LENGTH_SHORT).show()
+
     }
 }

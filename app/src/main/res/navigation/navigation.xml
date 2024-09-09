@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_fragmentArticle_to_fragmentBreakingNews"
             app:destination="@id/fragmentBreakingNews" />
+        <argument
+            android:name="article"
+            app:argType="com.example.flashfeed.dp.Article" />
     </fragment>
     <fragment
         android:id="@+id/fragmentSavedNews"
@@ -36,8 +39,6 @@
         <action
             android:id="@+id/action_fragmentBreakingNews_to_fragmentSavedNews"
             app:destination="@id/fragmentSavedNews" />
-        <argument
-            android:name="article"
-            app:argType="com.example.flashfeed.dp.Article" />
+
     </fragment>
 </navigation>
