@@ -7,13 +7,21 @@ import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
+import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +36,7 @@ import com.example.flashfeed.mvvm.NewsViewModelFac
 import com.example.flashfeed.wrapper.Resource
 import com.example.newsapiapp.mvvm.NewsDatabase
 
-class FragmentBreakingNews : Fragment(), ItemClickListener {
+class FragmentBreakingNews : Fragment(), ItemClickListener ,MenuProvider{
     lateinit var viewModel: NewsViewModel
     lateinit var newsAdapter: ArticleAdapter
     lateinit var rv: RecyclerView
@@ -38,10 +46,10 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
     lateinit var sports: TextView
     lateinit var health: TextView
     var isClicked: Boolean = false
-
+    var isOpened: Boolean = false
+var addingResponseList = arrayListOf<Article>()
     lateinit var noWifi: ImageView
     lateinit var noWifiText: TextView
-    var addingResponselist = arrayListOf<Article>()
 
     private val selectedBackground: Drawable? by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button) }
     private val defaultBackground: Drawable? = null
@@ -52,10 +60,18 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_breaking_news, container, false)
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        (activity as? AppCompatActivity)?.supportActionBar?.title = "Breaking News"
+
+
+        val menuHost: MenuHost = requireActivity()
+
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.CREATED)
+
         val doa = NewsDatabase.getInstance(requireActivity()).newsDao
         val repository = NewsRepo(doa)
         val factory = NewsViewModelFac(repository, requireActivity().application)
@@ -64,11 +80,11 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
         rv = view.findViewById(R.id.rvBreakingNews)
         pb = view.findViewById(R.id.paginationProgressBar)
         tec = view.findViewById(R.id.technology)
-        general = view.findViewById<TextView>(R.id.general)
-        sports = view.findViewById<TextView>(R.id.sport)
-        health = view.findViewById<TextView>(R.id.health)
-        noWifi = view.findViewById<ImageView>(R.id.noWifi)
-        noWifiText = view.findViewById<TextView>(R.id.noWifiText)
+        general = view.findViewById(R.id.general)
+        sports = view.findViewById(R.id.sport)
+        health = view.findViewById(R.id.health)
+        noWifi = view.findViewById(R.id.noWifi)
+        noWifiText = view.findViewById(R.id.noWifiText)
 
         val cm = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val nInfo = cm.activeNetworkInfo
@@ -133,8 +149,8 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
                 is Resource.Success -> {
                     hideProgressBar()
                     response.data?.let { newsResponse ->
-                        addingResponselist = newsResponse.articles as ArrayList<Article>
-                        newsAdapter.setList(addingResponselist)
+                        addingResponseList = newsResponse.articles as ArrayList<Article>
+                        newsAdapter.setList(addingResponseList)
                         Log.i("BreakingFragment", newsResponse.articles[1].toString())
                         newsAdapter.notifyDataSetChanged()
                     }
@@ -158,8 +174,8 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
                 is Resource.Success -> {
                     hideProgressBar()
                     response.data?.let { newsResponse ->
-                        addingResponselist = newsResponse.articles as ArrayList<Article>
-                        newsAdapter.setList(addingResponselist)
+                        addingResponseList = newsResponse.articles as ArrayList<Article>
+                        newsAdapter.setList(addingResponseList)
                         newsAdapter.notifyDataSetChanged()
                     }
                 }
@@ -197,6 +213,77 @@ class FragmentBreakingNews : Fragment(), ItemClickListener {
         val action = FragmentBreakingNewsDirections.actionFragmentBreakingNewsToFragmentArticle(article)
         view?.findNavController()?.navigate(action)
         Toast.makeText(context, "check ${article.title}", Toast.LENGTH_SHORT).show()
+
+    }
+    override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.menu, menu)
+        val menuItem = menu.findItem(R.id.searchNews)
+        val searchView = menuItem.actionView as? SearchView
+
+        searchView?.setOnClickListener {
+            val savedIcon = menu.findItem(R.id.savedNewsFrag)
+            savedIcon.isVisible = false
+            isOpened = true
+        }
+
+        searchView?.queryHint = "Search News"
+
+        searchView?.setOnCloseListener {
+            val savedIcon = menu.findItem(R.id.savedNewsFrag)
+            savedIcon.isVisible = true
+            isOpened = false
+            false // Return false to allow default close behavior
+        }
+
+        searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(pO: String?): Boolean {
+                newFilter(pO)
+return true
+            }
+
+            override fun onQueryTextChange(pO: String?): Boolean {
+
+                newFilter(pO)
+return true
+
+            }
+        })
+
+        super.onCreateOptionsMenu(menu, menuInflater)
+    }
+
+    private fun newFilter(pO: String?) {
+        val newFilteredList = ArrayList<Article>()
+
+        // Ensure the query is not null or empty
+        if (!pO.isNullOrEmpty()) {
+            for (article in addingResponseList) {
+                // Check if the article title contains the query string (case-insensitive)
+                article.title?.let {
+                    if (it.contains(pO, ignoreCase = true)) {
+                        newFilteredList.add(article)
+                    }
+                }
+            }
+        } else {
+            // If the query is empty, reset the filtered list to show all articles
+            newFilteredList.addAll(addingResponseList)
+        }
+
+        // Update the adapter with the filtered list
+        newsAdapter.setList(newFilteredList)
+        newsAdapter.notifyDataSetChanged()  // Ensure the list is refreshed in the UI
+    }
+    override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+
+
+        if (menuItem.itemId == R.id.savedNewsFrag){
+
+            view?.findNavController()?.navigate(R.id.action_fragmentBreakingNews_to_fragmentSavedNews)
+        }
+
+
+        return true
 
     }
 }

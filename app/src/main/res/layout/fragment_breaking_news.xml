@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:orientation="vertical"
     android:layout_height="match_parent">
 
     <ImageView
@@ -27,12 +28,12 @@
         android:id="@+id/noWifiText"/>
 
     <LinearLayout
-        android:id="@+id/hsv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp"
         android:orientation="horizontal"
-        android:gravity="center">
+        android:gravity="center"
+        android:id="@+id/hsv"
+        android:layout_marginBottom="15dp">
 
 
 

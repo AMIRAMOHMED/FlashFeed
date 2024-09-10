@@ -1,4 +1,5 @@
 package com.example.flashfeed.adapters
+import android.annotation.SuppressLint
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
@@ -90,13 +91,20 @@ class ArticleAdapter : RecyclerView.Adapter<ArticleHolder>() {
         this.listener = listener
     }
 
+
+    @SuppressLint("NotifyDataSetChanged")
     fun setList(articles: List<Article>) {
 
 this.articles=articles
         notifyDataSetChanged()
 
     }
+@SuppressLint("NotifyDataSetChanged")
+fun filteredLiset(filterArticle: List<Article>){
 
+    this.articles=filterArticle
+    notifyDataSetChanged()
+}
 
 
 }
