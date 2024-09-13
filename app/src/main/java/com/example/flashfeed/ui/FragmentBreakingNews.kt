@@ -57,7 +57,12 @@ class FragmentBreakingNews : Fragment(), ItemClickListener, MenuProvider {
             R.drawable.rounded_button
         )
     }
-    private val defaultBackground: Drawable? = null
+    private val defaultBackground: Drawable?  by lazy {
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.defaultbackgroundbutton
+        )
+    }
 
 
     override fun onCreateView(
@@ -98,6 +103,8 @@ class FragmentBreakingNews : Fragment(), ItemClickListener, MenuProvider {
             setUpRecyclerView()
             loadBreakingNews()
             isClicked = true
+            selectCategory(general)
+
         } else {
             noWifi.visibility = View.VISIBLE
             noWifiText.visibility = View.VISIBLE
@@ -147,9 +154,15 @@ class FragmentBreakingNews : Fragment(), ItemClickListener, MenuProvider {
         general.background = defaultBackground
         sports.background = defaultBackground
         health.background = defaultBackground
+        // Reset all text colors to gray
+        tec.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray))
+        general.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray))
+        sports.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray))
+        health.setTextColor(ContextCompat.getColor(requireContext(), R.color.gray))
 
-        // Set the selected background to the clicked category
         selectedTextView.background = selectedBackground
+        selectedTextView.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+
     }
 
     @SuppressLint("NotifyDataSetChanged")

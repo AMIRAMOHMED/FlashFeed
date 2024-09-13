@@ -25,7 +25,7 @@ class ArticleAdapter : RecyclerView.Adapter<ArticleHolder>() {
     private  var listener: ItemClickListener ?= null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ArticleHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.newlist, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.newsitem, parent, false)
         val viewHolder = ArticleHolder(view)
         return viewHolder
 
