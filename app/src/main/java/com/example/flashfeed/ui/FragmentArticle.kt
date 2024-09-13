@@ -1,4 +1,5 @@
 package com.example.flashfeed.ui
+
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -23,10 +24,10 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FragmentArticle : Fragment() {
 
-    private   lateinit var viewModel: NewsViewModel
+    private lateinit var viewModel: NewsViewModel
 
 
-    private lateinit var args : FragmentArticleArgs
+    private lateinit var args: FragmentArticleArgs
 
     private var stringCheck = ""
 
@@ -44,7 +45,6 @@ class FragmentArticle : Fragment() {
 
 
         (activity as AppCompatActivity).supportActionBar?.title = "Article View"
-
 
 
         val dao = NewsDatabase.getInstance(requireActivity()).newsDao
@@ -68,13 +68,12 @@ class FragmentArticle : Fragment() {
         val source = Source(args.article.source!!.id, args.article.source!!.name)
 
 
-        textTitle.text=(args.article.title)
-        tSource.text=(source.name)
+        textTitle.text = (args.article.title)
+        tSource.text = (source.name)
         tDescription.text = args.article.description
         tPubslishedAt.text = Utils.DateFormat(args.article.publishedAt)
 
         Glide.with(requireActivity()).load(args.article.urlToImage).into(imageView)
-
 
 
         // all the news are saved in the list
@@ -101,8 +100,7 @@ class FragmentArticle : Fragment() {
         fab.setOnClickListener {
 
 
-
-            if (args.article.title == stringCheck ){
+            if (args.article.title == stringCheck) {
 
 
                 Log.e("fragArg", "exists")
@@ -113,10 +111,12 @@ class FragmentArticle : Fragment() {
 
 
                 viewModel.insertArticle(
-                    SavedArticle(0, args.article.description!!,
-                    args.article.publishedAt!!, source,
-                    args.article.title!!, args.article.url!!,
-                    args.article.urlToImage!!)
+                    SavedArticle(
+                        0, args.article.description!!,
+                        args.article.publishedAt!!, source,
+                        args.article.title!!, args.article.url!!,
+                        args.article.urlToImage!!
+                    )
                 )
 
 
@@ -127,8 +127,6 @@ class FragmentArticle : Fragment() {
 
 
             }
-
-
 
 
         }

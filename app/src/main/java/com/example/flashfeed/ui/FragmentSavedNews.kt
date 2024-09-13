@@ -1,4 +1,5 @@
 package com.example.flashfeed.ui
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -24,8 +25,7 @@ import com.example.flashfeed.mvvm.NewsViewModel
 import com.example.flashfeed.mvvm.NewsViewModelFac
 import com.example.newsapiapp.mvvm.NewsDatabase
 
-
-class FragmentSavedNews : Fragment() , MenuProvider {
+class FragmentSavedNews : Fragment(), MenuProvider {
     private lateinit var viewModel: NewsViewModel
     private lateinit var newsAdapter: SavedArticleAdapter
     private lateinit var rv: RecyclerView
@@ -38,34 +38,29 @@ class FragmentSavedNews : Fragment() , MenuProvider {
         return inflater.inflate(R.layout.fragment_saved_news, container, false)
     }
 
-override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
-    (activity as AppCompatActivity).supportActionBar?.title = " Saved News"
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        (activity as AppCompatActivity).supportActionBar?.title = " Saved News"
 
 
-    val menuHost: MenuHost = requireActivity()
+        val menuHost: MenuHost = requireActivity()
 
-    menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.CREATED)
+        menuHost.addMenuProvider(this, viewLifecycleOwner, Lifecycle.State.CREATED)
 
-    rv = view.findViewById(R.id.rvSavedNews)
+        rv = view.findViewById(R.id.rvSavedNews)
 
-    val dao = NewsDatabase.getInstance(requireActivity()).newsDao
-    val repository = NewsRepo(dao)
-    val factory = NewsViewModelFac(repository, requireActivity().application)
-    viewModel = ViewModelProvider(this, factory)[NewsViewModel::class.java]
-    newsAdapter = SavedArticleAdapter()
-
-
-    viewModel.getSavedNews.observe(viewLifecycleOwner) {
-
-        newsAdapter.setlist(it)
-        setUpRecyclerView()
+        val dao = NewsDatabase.getInstance(requireActivity()).newsDao
+        val repository = NewsRepo(dao)
+        val factory = NewsViewModelFac(repository, requireActivity().application)
+        viewModel = ViewModelProvider(this, factory)[NewsViewModel::class.java]
+        newsAdapter = SavedArticleAdapter()
 
 
+        viewModel.getSavedNews.observe(viewLifecycleOwner) {
+            newsAdapter.setlist(it)
+            setUpRecyclerView()
+        }
     }
-
-
-}
 
     private fun setUpRecyclerView() {
         rv.apply {
@@ -76,8 +71,8 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.menu, menu)
-        val searchIcon=menu.findItem(R.id.searchNews)
-        val savedIcon=menu.findItem(R.id.savedNewsFrag)
+        val searchIcon = menu.findItem(R.id.searchNews)
+        val savedIcon = menu.findItem(R.id.savedNewsFrag)
         searchIcon.setVisible(false)
         savedIcon.setVisible(false)
         super.onCreateOptionsMenu(menu, menuInflater)
@@ -85,26 +80,27 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     }
 
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-if (
-    menuItem.itemId == R.id.deleteAll
-) {
-    val builder=AlertDialog.Builder(requireContext())
-    builder.setTitle("Delete All Articles")
-    builder.setMessage("Are you sure you want to delete all articles?")
-    builder.setPositiveButton("Yes") { dialog, which ->
-        viewModel.deleteArticle()
-        Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-        view?.findNavController()?.navigate(R.id.action_fragmentSavedNews_to_fragmentBreakingNews)
-    }
-    builder.setNegativeButton("No") { dialog, which ->
+        if (
+            menuItem.itemId == R.id.deleteAll
+        ) {
+            val builder = AlertDialog.Builder(requireContext())
+            builder.setTitle("Delete All Articles")
+            builder.setMessage("Are you sure you want to delete all articles?")
+            builder.setPositiveButton("Yes") { dialog, which ->
+                viewModel.deleteArticle()
+                Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                view?.findNavController()
+                    ?.navigate(R.id.action_fragmentSavedNews_to_fragmentBreakingNews)
+            }
+            builder.setNegativeButton("No") { dialog, which ->
 
 
-dialog.dismiss()
-    }
-val dialog=builder.create()
-    dialog.show()
+                dialog.dismiss()
+            }
+            val dialog = builder.create()
+            dialog.show()
 
-}
+        }
 
 
         return true

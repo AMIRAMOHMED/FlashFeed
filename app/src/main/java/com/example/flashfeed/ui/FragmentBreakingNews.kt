@@ -36,22 +36,27 @@ import com.example.flashfeed.mvvm.NewsViewModelFac
 import com.example.flashfeed.wrapper.Resource
 import com.example.newsapiapp.mvvm.NewsDatabase
 
-class FragmentBreakingNews : Fragment(), ItemClickListener ,MenuProvider{
+class FragmentBreakingNews : Fragment(), ItemClickListener, MenuProvider {
     private lateinit var viewModel: NewsViewModel
-    private  lateinit var newsAdapter: ArticleAdapter
-    private   lateinit var rv: RecyclerView
-    private    lateinit var pb: ProgressBar
-    private   lateinit var tec: TextView
-    private  lateinit var general: TextView
+    private lateinit var newsAdapter: ArticleAdapter
+    private lateinit var rv: RecyclerView
+    private lateinit var pb: ProgressBar
+    private lateinit var tec: TextView
+    private lateinit var general: TextView
     private lateinit var sports: TextView
-    private  lateinit var health: TextView
-    private  var isClicked: Boolean = false
+    private lateinit var health: TextView
+    private var isClicked: Boolean = false
     private var isOpened: Boolean = false
-    private   var addingResponseList = arrayListOf<Article>()
-    private  lateinit var noWifi: ImageView
-    private  lateinit var noWifiText: TextView
+    private var addingResponseList = arrayListOf<Article>()
+    private lateinit var noWifi: ImageView
+    private lateinit var noWifiText: TextView
 
-    private val selectedBackground: Drawable? by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button) }
+    private val selectedBackground: Drawable? by lazy {
+        ContextCompat.getDrawable(
+            requireContext(),
+            R.drawable.rounded_button
+        )
+    }
     private val defaultBackground: Drawable? = null
 
 
@@ -86,7 +91,8 @@ class FragmentBreakingNews : Fragment(), ItemClickListener ,MenuProvider{
         noWifi = view.findViewById(R.id.noWifi)
         noWifiText = view.findViewById(R.id.noWifiText)
 
-        val cm = requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val cm =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val nInfo = cm.activeNetworkInfo
         if (nInfo != null && nInfo.isConnected) {
             setUpRecyclerView()
@@ -105,18 +111,21 @@ class FragmentBreakingNews : Fragment(), ItemClickListener ,MenuProvider{
                     isClicked = true
                     selectCategory(tec)
                 }
+
                 R.id.general -> {
                     viewModel.getCategory("general")
                     loadCategoryNews()
                     isClicked = true
                     selectCategory(general)
                 }
+
                 R.id.sport -> {
                     viewModel.getCategory("sports")
                     loadCategoryNews()
                     isClicked = true
                     selectCategory(sports)
                 }
+
                 R.id.health -> {
                     viewModel.getCategory("health")
                     loadCategoryNews()
@@ -216,11 +225,13 @@ class FragmentBreakingNews : Fragment(), ItemClickListener ,MenuProvider{
     }
 
     override fun onItemClick(position: Int, article: Article) {
-        val action = FragmentBreakingNewsDirections.actionFragmentBreakingNewsToFragmentArticle(article)
+        val action =
+            FragmentBreakingNewsDirections.actionFragmentBreakingNewsToFragmentArticle(article)
         view?.findNavController()?.navigate(action)
         Toast.makeText(context, "check ${article.title}", Toast.LENGTH_SHORT).show()
 
     }
+
     override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
         menuInflater.inflate(R.menu.menu, menu)
         val menuItem = menu.findItem(R.id.searchNews)
@@ -244,13 +255,13 @@ class FragmentBreakingNews : Fragment(), ItemClickListener ,MenuProvider{
         searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(pO: String?): Boolean {
                 newFilter(pO)
-return true
+                return true
             }
 
             override fun onQueryTextChange(pO: String?): Boolean {
 
                 newFilter(pO)
-return true
+                return true
 
             }
         })
@@ -281,12 +292,14 @@ return true
         newsAdapter.setList(newFilteredList)
         newsAdapter.notifyDataSetChanged()  // Ensure the list is refreshed in the UI
     }
+
     override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
 
 
-        if (menuItem.itemId == R.id.savedNewsFrag){
+        if (menuItem.itemId == R.id.savedNewsFrag) {
 
-            view?.findNavController()?.navigate(R.id.action_fragmentBreakingNews_to_fragmentSavedNews)
+            view?.findNavController()
+                ?.navigate(R.id.action_fragmentBreakingNews_to_fragmentSavedNews)
         }
 
 
