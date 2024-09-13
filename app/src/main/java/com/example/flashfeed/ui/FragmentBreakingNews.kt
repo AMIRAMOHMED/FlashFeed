@@ -1,5 +1,6 @@
 package com.example.flashfeed.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
@@ -22,7 +23,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,19 +37,19 @@ import com.example.flashfeed.wrapper.Resource
 import com.example.newsapiapp.mvvm.NewsDatabase
 
 class FragmentBreakingNews : Fragment(), ItemClickListener ,MenuProvider{
-    lateinit var viewModel: NewsViewModel
-    lateinit var newsAdapter: ArticleAdapter
-    lateinit var rv: RecyclerView
-    lateinit var pb: ProgressBar
-    lateinit var tec: TextView
-    lateinit var general: TextView
-    lateinit var sports: TextView
-    lateinit var health: TextView
-    var isClicked: Boolean = false
-    var isOpened: Boolean = false
-var addingResponseList = arrayListOf<Article>()
-    lateinit var noWifi: ImageView
-    lateinit var noWifiText: TextView
+    private lateinit var viewModel: NewsViewModel
+    private  lateinit var newsAdapter: ArticleAdapter
+    private   lateinit var rv: RecyclerView
+    private    lateinit var pb: ProgressBar
+    private   lateinit var tec: TextView
+    private  lateinit var general: TextView
+    private lateinit var sports: TextView
+    private  lateinit var health: TextView
+    private  var isClicked: Boolean = false
+    private var isOpened: Boolean = false
+    private   var addingResponseList = arrayListOf<Article>()
+    private  lateinit var noWifi: ImageView
+    private  lateinit var noWifiText: TextView
 
     private val selectedBackground: Drawable? by lazy { ContextCompat.getDrawable(requireContext(), R.drawable.rounded_button) }
     private val defaultBackground: Drawable? = null
@@ -143,8 +143,9 @@ var addingResponseList = arrayListOf<Article>()
         selectedTextView.background = selectedBackground
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadBreakingNews() {
-        viewModel.breakingNews.observe(viewLifecycleOwner, Observer { response ->
+        viewModel.breakingNews.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
                     hideProgressBar()
@@ -155,21 +156,24 @@ var addingResponseList = arrayListOf<Article>()
                         newsAdapter.notifyDataSetChanged()
                     }
                 }
+
                 is Resource.Error -> {
                     hideProgressBar()
                     response.data?.let { message ->
                         Log.i("BreakingFragment", message.toString())
                     }
                 }
+
                 is Resource.Loading -> {
                     showProgressBar()
                 }
             }
-        })
+        }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun loadCategoryNews() {
-        viewModel.categoryNews.observe(viewLifecycleOwner, Observer { response ->
+        viewModel.categoryNews.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Success -> {
                     hideProgressBar()
@@ -179,17 +183,19 @@ var addingResponseList = arrayListOf<Article>()
                         newsAdapter.notifyDataSetChanged()
                     }
                 }
+
                 is Resource.Error -> {
                     hideProgressBar()
                     response.data?.let { message ->
                         Log.i("CategoryFragment", message.toString())
                     }
                 }
+
                 is Resource.Loading -> {
                     showProgressBar()
                 }
             }
-        })
+        }
     }
 
     private fun setUpRecyclerView() {
@@ -252,6 +258,7 @@ return true
         super.onCreateOptionsMenu(menu, menuInflater)
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     private fun newFilter(pO: String?) {
         val newFilteredList = ArrayList<Article>()
 

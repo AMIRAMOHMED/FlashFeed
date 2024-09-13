@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
@@ -24,12 +23,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class FragmentArticle : Fragment() {
 
-    lateinit var viewModel: NewsViewModel
+    private   lateinit var viewModel: NewsViewModel
 
 
-    lateinit var args : FragmentArticleArgs
+    private lateinit var args : FragmentArticleArgs
 
-    var stringCheck = ""
+    private var stringCheck = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,7 +43,7 @@ class FragmentArticle : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        (activity as AppCompatActivity).supportActionBar?.setTitle("Article View")
+        (activity as AppCompatActivity).supportActionBar?.title = "Article View"
 
 
 
@@ -69,23 +68,23 @@ class FragmentArticle : Fragment() {
         val source = Source(args.article.source!!.id, args.article.source!!.name)
 
 
-        textTitle.setText(args.article.title)
-        tSource.setText(source.name)
-        tDescription.setText(args.article.description)
-        tPubslishedAt.setText(Utils.DateFormat(args.article.publishedAt))
+        textTitle.text=(args.article.title)
+        tSource.text=(source.name)
+        tDescription.text = args.article.description
+        tPubslishedAt.text = Utils.DateFormat(args.article.publishedAt)
 
         Glide.with(requireActivity()).load(args.article.urlToImage).into(imageView)
 
 
 
         // all the news are saved in the list
-        viewModel.getSavedNews.observe(viewLifecycleOwner, Observer {
+        viewModel.getSavedNews.observe(viewLifecycleOwner) {
 
 
-            for (i in it){
+            for (i in it) {
 
 
-                if (args.article.title == i.title){
+                if (args.article.title == i.title) {
 
                     stringCheck = i.title
 
@@ -96,8 +95,7 @@ class FragmentArticle : Fragment() {
             }
 
 
-
-        })
+        }
 
 
         fab.setOnClickListener {
