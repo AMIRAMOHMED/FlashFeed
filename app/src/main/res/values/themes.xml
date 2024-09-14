@@ -10,8 +10,6 @@
         <!-- Background color -->
         <item name="android:colorBackground">@color/white</item>
 
-        <!-- Divider color -->
-        <item name="android:divider">@color/gray</item>
     </style>
 
     <style name="Theme.FlashFeed" parent="Base.Theme.FlashFeed" />
