@@ -43,41 +43,21 @@ class ArticleAdapter : RecyclerView.Adapter<ArticleHolder>() {
         val requestOption = RequestOptions()
 
         holder.itemView.apply {
+            holder.pb.visibility = View.VISIBLE
+            Glide.with(this).load(article.urlToImage)
+                .error(R.drawable.image_error)
+                .placeholder(R.drawable.ic_search)
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(holder.imageView)
+            holder.pb.visibility = View.GONE
 
-            Glide.with(this)
-                .load(article.urlToImage)
-                .apply(requestOption)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>,
-                        isFirstResource: Boolean
-                    ): Boolean {
-
-
-                        holder.pb.visibility = View.VISIBLE
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Drawable,
-                        model: Any,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        holder.pb.visibility = View.GONE
-                        return false
-                    }
-                }).transition(DrawableTransitionOptions.withCrossFade()).into(holder.imageView)
             holder.textTitle.text = article.title
             holder.tvSource.text = article.source!!.name
-
             holder.tvDescription.text = article.description
             holder.tvPubslishedAt.text = Utils.DateFormat(article.publishedAt)
-
         }
+
+
 
         holder.itemView.setOnClickListener {
             listener?.onItemClick(position,article)

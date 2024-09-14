@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
@@ -36,7 +37,7 @@ class FragmentArticle : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_article, container, false)
+        return inflater.inflate(R.layout.details_article, container, false)
     }
 
 
@@ -64,6 +65,7 @@ class FragmentArticle : Fragment() {
         val tDescription: TextView = view.findViewById(R.id.tvDescription)
         val tPubslishedAt: TextView = view.findViewById(R.id.tvPublishedAt)
         val imageView: ImageView = view.findViewById(R.id.articleImage)
+//        val tvContent: TextView = view.findViewById(R.id.tvContent)
 
         val source = Source(args.article.source!!.id, args.article.source!!.name)
 
@@ -72,6 +74,8 @@ class FragmentArticle : Fragment() {
         tSource.text = (source.name)
         tDescription.text = args.article.description
         tPubslishedAt.text = Utils.DateFormat(args.article.publishedAt)
+
+//        tvContent.text = args.article.content
 
         Glide.with(requireActivity()).load(args.article.urlToImage).into(imageView)
 
@@ -103,9 +107,9 @@ class FragmentArticle : Fragment() {
             if (args.article.title == stringCheck) {
 
 
-                Log.e("fragArg", "exists")
+//                Log.e("fragArg", "exists")
 
-                // Toast.makeText(context, "Article exists in saved list", Toast.LENGTH_SHORT).show()
+                 Toast.makeText(context, "Article exists in saved list", Toast.LENGTH_SHORT).show()
 
             } else {
 
