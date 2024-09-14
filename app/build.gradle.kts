@@ -74,7 +74,6 @@ dependencies {
     testImplementation( libs.junit)
     androidTestImplementation (libs.androidx.junit)
     androidTestImplementation (libs.androidx.espresso.core)
-    testImplementation (libs.truth)
-    androidTestImplementation(libs.truth)
-
+    testImplementation ("com.google.truth:truth:1.1.3")
+androidTestImplementation("com.google.truth:truth:1.1.3")
 }
